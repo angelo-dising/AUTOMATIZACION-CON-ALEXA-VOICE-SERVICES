@@ -1,0 +1,65 @@
+#ifdef ARDUINO_ARCH_ESP32
+#include <WiFi.h>
+#else
+#include <ESP8266WiFi.h>
+#endif
+
+#include <Espalexa.h>
+
+int LED_BUILTIN = 2; 
+const char* ssid = "bd30ba";
+const char* password = "1234567890";
+
+Espalexa echo_dot;
+void FuncionFoco(uint8_t brightness);
+
+void setup() {
+  Serial.begin(115200);
+
+  pinMode(LED_BUILTIN, OUTPUT);
+  ConectarWifi();
+
+  echo_dot.addDevice("LED", Funcionsmd);
+  echo_dot.begin();
+}
+
+void loop() {
+  ConectarWifi();
+  echo_dot.loop();
+  delay(1);
+}
+
+void ConectarWifi() {
+  if (WiFi.status() != WL_CONNECTED) {
+    WiFi.mode(WIFI_STA);
+    WiFi.begin(ssid, password);
+    Serial.println("");
+    Serial.println("iniciando coneccion wifi");
+    while (WiFi.status() != WL_CONNECTED) {
+      digitalWrite(LED_BUILTIN, 1);
+      delay(500);
+      digitalWrite(LED_BUILTIN, 0);
+      delay(500);
+      Serial.print(".");
+    }
+    Serial.print("Connected to ");
+    Serial.println(ssid);
+    Serial.print("IP address: ");
+    Serial.println(WiFi.localIP());
+  }
+} 
+
+
+void Funcionsmd(uint8_t brightness) {
+  Serial.print("Funcion smd -");
+
+  if (brightness>0) {
+    digitalWrite(LED_BUILTIN, 1);
+    Serial.println(" on ");
+    Serial.println(brightness);
+  }
+  else {
+    digitalWrite(LED_BUILTIN, 0);
+    Serial.println(" off ");
+      Serial.println(brightness);
+  }
